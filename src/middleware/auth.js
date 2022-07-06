@@ -19,7 +19,7 @@ const authenticate = function (req, res, next) {
     // storing the decoded token
 
     req.token = decodedToken;
-
+    
     next();
   } catch (err) {
     res.status(400).send({
@@ -38,7 +38,7 @@ const authorise = async function (req, res, next) {
       return res.status(404).send({ status: false, message: "Invalid userId" });
     }
 
-    if (checkData.userId != req.token.userId) {
+    if (checkData._id != req.token.userId) {
       return res
         .status(404)
         .send({ status: false, msg: "Authorization failed." });

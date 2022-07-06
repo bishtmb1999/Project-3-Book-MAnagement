@@ -180,10 +180,10 @@ const getBooks = async function(req, res) {
                       .status(400)
                       .send({ status: false, message: "UserId is required" });
                   }
-            if(!validateString(category)) {
+            if(category && validateString(category)) {
                 obj.category = category
             }
-            if(!validateString(subcategory)) {
+            if(subcategory && validateString(subcategory)) {
                 obj.subcategory = {$in: subcategory}
             }
 
@@ -213,6 +213,51 @@ const getBooks = async function(req, res) {
         })
     }
 }
+const updateBook = async function (req, res) {
 
-module.exports.createBook = createBook;
-module.exports.getBooks=getBooks
+    try {
+      let id = req.params.bookId;
+      let data = req.body;
+      let book = await bookModel.findOne({ _id: id, isDeleted: false });
+      if (Object.keys(book).length == 0) {
+        return res.status(404).send('No such book found');
+      }
+      if (data.title) book.title = data.title;
+      if (data.excerpt) book.excerpt = data.excerpt;
+      if (data.ISBN) book.ISBN = data.ISBN;
+      if (data.releasedAt) book.releasedAt = data.releasedAt;
+       
+      let updateData = await bookModel.findByIdAndUpdate({ _id: id }, book, {
+        new: true,
+      });
+      res.status(200).send({ message: " Data is Updated "});
+    } catch (err) {
+      res.status(500).send({ message: 'Error', error: err.message });
+    }
+  };
+
+  const deleteBook = async function (req, res) {
+    try {
+      let bookId = req.params.bookId;
+      if (!bookId)
+        res.status(400).send({ status: false, msg: "Please include an bookId" });
+      let book = await bookModel.findById(bookId);
+      if (!book)
+        return res.status(404).send({ status: false, msg: "BOOK NOT FOUND" });
+      if (book.isDeleted == true) {
+        res
+          .status(400)
+          .send({ status: false, msg: "This bookdata is already deleted" });
+      }
+      let newData = await bookModel.findOneAndUpdate(
+        { _id: bookId },
+        { $set: { isDeleted: true,deletedAt: Date.now() } },
+        { new: true }
+      );
+      res.status(200).send({ status: true });
+    } catch (err) {
+      res.status(500).send({ status: false, msg: "ERROR", error: err.message });
+    }
+  };
+
+module.exports={createBook,getBooks, updateBook,deleteBook }

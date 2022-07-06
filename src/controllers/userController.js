@@ -105,7 +105,7 @@ if (!validateString(password))  {
         },
         "functionup-radon"
       );
-      res.setHeader("x-api-key", token);
+      
       res.status(201).send({ status: true, message:"Success" ,data:token});
       }
       catch (err) {
