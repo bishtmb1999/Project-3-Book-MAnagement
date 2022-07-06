@@ -83,6 +83,11 @@ const validateEnum = function validateEnum(value) {
   let isValidObjectId = function (ObjectId) {
     return mongoose.isValidObjectId(ObjectId)
 }
+const passwordLength = function (password) {
+    if (password.length >= 8 && password.length <= 15) {
+      return true;
+    } else return false;
+  };
   
   module.exports = {
     validateString,
@@ -92,5 +97,6 @@ const validateEnum = function validateEnum(value) {
     validatePassword,
     validateRequest,
     validateNumber,
-    isValidObjectId
+    isValidObjectId,
+    passwordLength
   };

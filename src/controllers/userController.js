@@ -8,21 +8,14 @@ const {
     validatePassword,
     validateRequest,
     validateNumber,
-   isValidObjectId 
+   isValidObjectId, 
+   passwordLength
   } = require("../validator/validation");
 
 
 const validator  = require('validator')
 
-// const isValid = function (value) {
-//     if (typeof value === "undefined" || value === null) return false
-//     if (typeof value === "string" && value.trim().length === 0) return false
-//     return true;
-// }
 
-// const validateRequest = function (details) {
-//     return Object.keys(details).length > 0
-// }
 
 const regxValidator = function(val){
     let regx = /^[a-zA-Z]+([\s][a-zA-Z]+)*$/;
@@ -66,8 +59,8 @@ const createUser = async function (req, res) {
         if (checkEmailId) {
             return res.status(400).send({ status: false, message: `email ${user.email} is already used` })
         }
-        if(!(8<user.password.legth<15)){
-            return res.status(400).send({ status: false, message: "enter valid password" })   
+        if(!passwordLength(user.password)){
+            return res.status(400).send({ status: false, message: "password must be between 8 to 15" })   
         }
         
         if((Object.keys(user.address).length==0)){

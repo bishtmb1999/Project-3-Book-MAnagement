@@ -158,17 +158,6 @@ const createBook = async function (req, res) {
   }
 };
 
-module.exports.createBook = createBook;
-
-
-
-
-
-
-
-
-
-
 
 const getBooks = async function(req, res) {
     try{
@@ -224,4 +213,6 @@ const getBooks = async function(req, res) {
         })
     }
 }
+
+module.exports.createBook = createBook;
 module.exports.getBooks=getBooks
