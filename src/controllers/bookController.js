@@ -319,13 +319,13 @@ const updateBook = async function (req, res) {
       if (!book)
         return res.status(404).send({ status: false, msg: "BOOK NOT FOUND" });
       if (book.isDeleted == true) {
-        res
+       return res
           .status(400)
           .send({ status: false, msg: "This bookdata is already deleted" });
       }
       let newData = await bookModel.findOneAndUpdate(
         { _id: bookId },
-        { $set: { isDeleted: true,deletedAt: moment().format('Do MMMM YYYY, h:mm:ss a')
+        { $set: { isDeleted: true,deletedAt: moment().toISOString()
         } },
         { new: true }
       );
