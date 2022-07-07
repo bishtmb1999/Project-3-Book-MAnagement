@@ -88,6 +88,12 @@ const passwordLength = function (password) {
       return true;
     } else return false;
   };
+  const isbnLength = function (value) {
+    if (value.length >= 10 && value.length <= 13) {
+      return true;
+    } else return false;
+  };
+  
   
   module.exports = {
     validateString,
@@ -98,5 +104,6 @@ const passwordLength = function (password) {
     validateRequest,
     validateNumber,
     isValidObjectId,
-    passwordLength
+    passwordLength,
+    isbnLength 
   };

@@ -7,11 +7,10 @@ const {
   validateString,
   convertToArray,
   checkValue,
-  validateEmail,
-  validatePassword,
   validateRequest,
   validateNumber,
- isValidObjectId 
+ isValidObjectId,
+ isbnLength 
 } = require("../validator/validation");
 
 // =========================POST BOOK =========================
@@ -94,6 +93,7 @@ const createBook = async function (req, res) {
           .status(400)
           .send({ status: false, message: "Enter a valid ISBN" });
       }
+      if(!isbnLength(ISBN)){return res.status(400).send({status:false,message:"ISBN must be between 10-13"})}
       const isDuplicate = await bookModel.find({ ISBN: ISBN });
       if (isDuplicate.length == 0) {
         book.ISBN = ISBN;
@@ -107,11 +107,7 @@ const createBook = async function (req, res) {
      return res.status(400).send({ status: false, message: "ISBN is required" });
     }
 
-
-
-
-
-    if (category) {
+   if (category) {
       if (!validateString(category)) {
         return res
           .status(400)
@@ -148,7 +144,7 @@ const createBook = async function (req, res) {
     }
 
     if (releasedAt) {
-      book.releasedAt = moment().format('Do MMMM YYYY, h:mm:ss a');
+      book.releasedAt = moment().toISOString();
     } else {
       return res
         .status(400)
@@ -292,7 +288,8 @@ const updateBook = async function (req, res) {
       else{ book.excerpt = data.excerpt;}
      
       // if(validateString(data.ISBN)){return res.status(400).send({status:false,message:"please provide a valid ISBN"})}
-     let duplicateISBN = await bookModel.find({ ISBN:data.ISBN })
+      if(!isbnLength(ISBN)){return res.status(400).send({status:false,message:"ISBN must be between 10-13"})}
+      let duplicateISBN = await bookModel.find({ ISBN:data.ISBN })
        if(duplicateISBN.length!=0){return res.status(400).send({status:false,message:"this ISBN is already present"})}
      else{ book.ISBN = data.ISBN;}
      
@@ -326,7 +323,7 @@ const updateBook = async function (req, res) {
       let newData = await bookModel.findOneAndUpdate(
         { _id: bookId },
         { $set: { isDeleted: true,deletedAt: moment().toISOString()
-        } },
+         } },
         { new: true }
       );
       res.status(200).send({ status: true , message:"Success" });
