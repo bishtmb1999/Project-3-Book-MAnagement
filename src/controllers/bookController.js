@@ -237,7 +237,7 @@ const getBookById = async function(req, res) {
           if(data.isDeleted==true){
               return res.status.send({
                   status: false,
-                  message: "Book already deletd"
+                  message: "Book already deleted"
               })
           }
 
@@ -271,10 +271,11 @@ const updateBook = async function (req, res) {
     try {
       let id = req.params.bookId;
       let data = req.body;
+    
       if(!validateRequest(data)){return res.status(400).send({status:false,message:"please provide body data"})}
-      let book = await bookModel.findOne({ _id: id, isDeleted: false });
+      let book = await bookModel.findOne({_id:id, isDeleted: false })
       if (Object.keys(book).length == 0) {
-        return res.status(404).send('No such book found');
+        return res.status(404).send({status:true,message:'No such book found'});
       }
      ;
       // if(validateString(data.title)){return res.status(400).send({status:false,message:"please provide valid title"})}
@@ -288,7 +289,7 @@ const updateBook = async function (req, res) {
       else{ book.excerpt = data.excerpt;}
      
       // if(validateString(data.ISBN)){return res.status(400).send({status:false,message:"please provide a valid ISBN"})}
-      if(!isbnLength(ISBN)){return res.status(400).send({status:false,message:"ISBN must be between 10-13"})}
+      if(!isbnLength(data.ISBN)){return res.status(400).send({status:false,message:"ISBN must be between 10-13"})}
       let duplicateISBN = await bookModel.find({ ISBN:data.ISBN })
        if(duplicateISBN.length!=0){return res.status(400).send({status:false,message:"this ISBN is already present"})}
      else{ book.ISBN = data.ISBN;}
@@ -297,7 +298,7 @@ const updateBook = async function (req, res) {
      if(data.releasedAt){ book.releasedAt = data.releasedAt;}
       
        
-      let updateData = await bookModel.findByIdAndUpdate({ _id:id }, book, {
+      let updateData = await bookModel.findOneAndUpdate({_id:id}, {$set:data}, {
         new: true,
       });
       res.status(200).send({status:true, message: " Data is Updated ", data:updateData});
