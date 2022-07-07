@@ -22,9 +22,9 @@ const validateEnum = function validateEnum(value) {
   };
   
   const validateString = function validateString(value) {
-    if (!value) {
-      return false;
-    }
+    // if (!value) {
+    //   return false;
+    // }
   
     if (typeof value == "string" && value.trim().length != 0) {
       return true;
