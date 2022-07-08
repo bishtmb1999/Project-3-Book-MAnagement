@@ -21,15 +21,10 @@ const validateEnum = function validateEnum(value) {
     return false;
   };
   
-  const validateString = function validateString(value) {
-    // if (!value) {
-    //   return false;
-    // }
-  
-    if (typeof value == "string" && value.trim().length != 0) {
-      return true;
-    }
-    return false;
+  const validateString = function (name) {
+    if (typeof name == undefined || typeof name == null) return false;
+    if (typeof name == "string" && name.trim().length == 0) return false;
+     return true;
   };
   
   const checkValue = function (value) {
@@ -88,13 +83,22 @@ const passwordLength = function (password) {
       return true;
     } else return false;
   };
-  const isbnLength = function (value) {
-    if (value.length >= 10 && value.length <= 13) {
-      return true;
-    } else return false;
-  };
+  // const isbnLength = function (value) {
+  //   if (value.length == 10 || value.length == 13 || value.length==17) {
+  //     return true;
+  //   } 
+  //   if (( /^[0-9]*$/).test()){return true}
+  //   else return false;
+  // };
   
-  
+  const isValidISBN =function(ISBN){
+   
+    if(/^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/.test(ISBN) ||/^(?=(?:\D*\d){13}(?:(?:\D*\d){3})?$)[\d-]+$/.test(ISBN) ||/^(?=(?:\D*\d){17}(?:(?:\D*\d){3})?$)[\d-]+$/.test(ISBN)){
+        return true
+    }
+    
+    else{return false}
+}
   module.exports = {
     validateString,
     convertToArray,
@@ -105,5 +109,7 @@ const passwordLength = function (password) {
     validateNumber,
     isValidObjectId,
     passwordLength,
-    isbnLength 
+     
+    
+    isValidISBN
   };

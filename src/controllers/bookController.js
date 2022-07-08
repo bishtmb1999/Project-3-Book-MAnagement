@@ -10,7 +10,7 @@ const {
   validateRequest,
   validateNumber,
  isValidObjectId,
- isbnLength 
+ isValidISBN
 } = require("../validator/validation");
 
 // =========================POST BOOK =========================
@@ -87,13 +87,9 @@ const createBook = async function (req, res) {
     }
 
 
-    if (ISBN) {
-      if (!validateString(ISBN)) {
-        return res
-          .status(400)
-          .send({ status: false, message: "Enter a valid ISBN" });
-      }
-      if(!isbnLength(ISBN)){return res.status(400).send({status:false,message:"ISBN must be between 10-13"})}
+    if (!ISBN) {return res.status(400).send({status:false,message:"please provide ISBN"})}
+      
+      if(!isValidISBN(ISBN)){return res.status(400).send({status:false,message:"please provide a valid ISBN"})}
       const isDuplicate = await bookModel.find({ ISBN: ISBN });
       if (isDuplicate.length == 0) {
         book.ISBN = ISBN;
@@ -103,9 +99,7 @@ const createBook = async function (req, res) {
           message: "This ISBN is already present in books collection",
         });
       }
-    } else {
-     return res.status(400).send({ status: false, message: "ISBN is required" });
-    }
+    
 
    if (category) {
       if (!validateString(category)) {
@@ -266,39 +260,46 @@ const getBookById = async function(req, res) {
 
 
 
-const updateBook = async function (req, res) {
+// =========================UPDATE BOOK BY BOOKID =========================
+
+  const updateBook = async function (req, res) {
 
     try {
       let id = req.params.bookId;
       let data = req.body;
-    
+      
+    if(!isValidObjectId(id)){return res.status(400).send({status:false,message:"please provide a valid bookId"})}
       if(!validateRequest(data)){return res.status(400).send({status:false,message:"please provide body data"})}
       let book = await bookModel.findOne({_id:id, isDeleted: false })
-      if (Object.keys(book).length == 0) {
+
+      if (book== null) {
         return res.status(404).send({status:true,message:'No such book found'});
       }
      ;
-      // if(validateString(data.title)){return res.status(400).send({status:false,message:"please provide valid title"})}
+      if(!validateString(data.title)){return res.status(400).send({status:false,message:"please provide valid title"})}
       let duplicateTitle = await bookModel.find({ title:data.title })
+
+      
+
       if(duplicateTitle.length!=0){return res.status(400).send({status:false,message:"this title is already present"})}
        else{ book.title = data.title;}
      
-      //  if(validateString(data.excerpt)){return res.status(400).send({status:false,message:"please provide valid excerpt"})}
+       if(!validateString(data.excerpt)){return res.status(400).send({status:false,message:"please provide valid excerpt"})}
        let duplicateExcerpt = await bookModel.find({ excerpt:data.excerpt })
        if(duplicateExcerpt.length!=0){return res.status(400).send({status:false,message:"this excerpt is already present"})}
       else{ book.excerpt = data.excerpt;}
      
-      // if(validateString(data.ISBN)){return res.status(400).send({status:false,message:"please provide a valid ISBN"})}
-      if(!isbnLength(data.ISBN)){return res.status(400).send({status:false,message:"ISBN must be between 10-13"})}
+      if(!validateString(data.ISBN)){return res.status(400).send({status:false,message:"please provide ISBN"})}
+      if(data.ISBN && !isValidISBN(data.ISBN)){return res.status(400).send({status:false,message:"ISBN must be in right format"})}
       let duplicateISBN = await bookModel.find({ ISBN:data.ISBN })
        if(duplicateISBN.length!=0){return res.status(400).send({status:false,message:"this ISBN is already present"})}
      else{ book.ISBN = data.ISBN;}
      
-    //  if(validateString(data.releasedAt)){return res.status(400).send({status:false,message:"please provide a valid releasedAt"})}
+     if(!validateString(data.releasedAt)){return res.status(400).send({status:false,message:"please provide a valid releasedAt"})}
      if(data.releasedAt){ book.releasedAt = data.releasedAt;}
       
-       
-      let updateData = await bookModel.findOneAndUpdate({_id:id}, {$set:data}, {
+      
+      let updateData = await bookModel.findOneAndUpdate({_id:id}, {$set:book}, {
         new: true,
       });
       res.status(200).send({status:true, message: " Data is Updated ", data:updateData});
@@ -306,6 +307,8 @@ const updateBook = async function (req, res) {
       res.status(500).send({ status:false, error: err.message });
     }
   };
+
+// =========================DELETE BOOK BY BOOK ID =========================
 
   const deleteBook = async function (req, res) {
     try {
