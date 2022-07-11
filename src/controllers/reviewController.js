@@ -2,7 +2,7 @@ const bookModel = require("../models/bookModel")
 let reviewModel = require("../models/reviewModel")
 
 
-const { isValidObjectId, validateString, validateRequest, validateNumber } = require("../validator/validation")
+const {  validateString, validateRequest, validateNumber, validateObjectId } = require("../validator/validation")
 
 
 
@@ -12,7 +12,7 @@ const { isValidObjectId, validateString, validateRequest, validateNumber } = req
 const createReview = async function (req, res) {
     try {
         const bookId = req.params.bookId
-        if (!isValidObjectId) {
+        if (!validateObjectId(bookId)) {
             return res.status(400).send({
                 status: false,
                 message: "Book id invalid"
@@ -22,7 +22,7 @@ const createReview = async function (req, res) {
         if (!validateRequest(reviewData)) {
             return res.status(400).send({
                 status: false,
-                message: "Body is required for create rewiew "
+                message: "Body is required for create review "
             })
         }
         let { reviewedBy,
@@ -124,7 +124,7 @@ const updateReview = async function (req, res) {
         let bookId = req.params.bookId;
         let reviewId = req.params.reviewId;
 
-        if (!isValidObjectId(bookId) || !isValidObjectId(reviewId)) {
+        if (!validateObjectId(bookId) || !validateObjectId(reviewId)) {
             return res
                 .status(400)
                 .send({ status: false, message: "Enter valid bookId or reviewId" });
@@ -204,7 +204,7 @@ let deleteReview = async function (req, res) {
         let review = await reviewModel.findById(reviewId)
         if (!review) { return res.status(404).send({ status: false, message: "book review doesnot exists" }) }
         if (review.isDeleted == true) { return res.status(404).send({ status: false, message: "this review is already deleted" }) }
-        let deleteReview = await reviewModel.findOneAndUpdate({ _Id: reviewId }, { $set: { isDeleted: true } })
+        let deleteReview = await reviewModel.findOneAndUpdate({ _id: reviewId }, { $set: { isDeleted: true } })
 
 
         let reviewsleft = await reviewModel.find({ bookId: bookId, isDeleted: false })

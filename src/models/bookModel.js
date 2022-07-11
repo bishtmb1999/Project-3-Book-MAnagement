@@ -3,7 +3,7 @@ let objectId=mongoose.Schema.Types.ObjectId
 let bookSchema=new mongoose.Schema({
     title: {type:String, required:true, unique:true},
     excerpt: {type:String, required:true}, 
-    userId: {type:objectId, required:true, ref:'User'},
+    userId: {type:objectId, required:true, ref:"User"},
     ISBN: {type:String, required:true, unique:true},
     category: {type:String, required:true},
     subcategory:{type:[String] ,required:true},

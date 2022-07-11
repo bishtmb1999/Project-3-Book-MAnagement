@@ -9,7 +9,7 @@ const {
   checkValue,
   validateRequest,
   validateNumber,
- isValidObjectId,
+ validateObjectId,
  isValidISBN
 } = require("../validator/validation");
 
@@ -67,24 +67,12 @@ const createBook = async function (req, res) {
      return res.status(400).send({ status: false, message: "Excerpt is required" });
     }
 
-    if (userId) {
-        if(!isValidObjectId(userId)){
-            return res.status(400).send({status: false, message: "Invalid userId"})
+    if (!validateString(userId)) {return res.status(400).send({status: false, message: "please provide userId"})}
+        if(!validateObjectId(userId)){
+        return res.status(400).send({status: false, message: "Invalid userId"})
         }
-      let isDuplicate = await userModel.find({_id: userId});
-      if (isDuplicate.length == 0) {
-        return res.status(400).send({
-          status: false,
-          message: "This UserID not present in the user collection",
-        });
-      } else {
-        book.userId = userId;
-      }
-    } else {
-      return res
-        .status(400)
-        .send({ status: false, message: "UserId is required" });
-    }
+        book.userId=userId
+     
 
 
     if (!ISBN) {return res.status(400).send({status:false,message:"please provide ISBN"})}
@@ -160,7 +148,7 @@ const getBooks = async function(req, res) {
             let {userId, category, subcategory} = queryData
 
             if(userId){
-                if(!isValidObjectId(userId)){
+                if(!validateObjectId(userId)){
                     return res.status(400).send({status: false, message: "Invalid userId"})
                 }
                 obj.userId = userId
@@ -207,7 +195,7 @@ const getBooks = async function(req, res) {
 const getBookById = async function(req, res) {
   try {
       const bookId = req.params.bookId
-      if(!isValidObjectId(bookId)){
+      if(!validateObjectId(bookId)){
           return res.status(400).send({
               status: false,
               message: "Bookid invalid"
@@ -263,7 +251,7 @@ const getBookById = async function(req, res) {
       let id = req.params.bookId;
       let data = req.body;
       
-    if(!isValidObjectId(id)){return res.status(400).send({status:false,message:"please provide a valid bookId"})}
+    if(!validateObjectId(id)){return res.status(400).send({status:false,message:"please provide a valid bookId"})}
       if(!validateRequest(data)){return res.status(400).send({status:false,message:"please provide body data"})}
       let book = await bookModel.findOne({_id:id, isDeleted: false })
 
@@ -310,7 +298,7 @@ const getBookById = async function(req, res) {
       let bookId = req.params.bookId;
       if (bookId.length==0)
        {return res.status(400).send({ status: false, msg: "Please include an bookId" })};
-        if(!isValidObjectId(bookId)){return res.status(400).send({ status: false, msg: "Please enter a valid bookId" })}
+        if(!validateObjectId(bookId)){return res.status(400).send({ status: false, msg: "Please enter a valid bookId" })}
       let book = await bookModel.findById(bookId);
       if (!book)
         return res.status(404).send({ status: false, msg: "BOOK NOT FOUND" });

@@ -2,9 +2,7 @@ const  mongoose= require("mongoose");
 
 
 const validateEnum = function validateEnum(value) {
-    if (!value) {
-      return false;
-    }
+    
   
     var titleEnum = ["Mr", "Mrs", "Miss"];
     if (titleEnum.includes(value)) {
@@ -24,6 +22,7 @@ const validateEnum = function validateEnum(value) {
   const validateString = function (name) {
     if (typeof name == undefined || typeof name == null) return false;
     if (typeof name == "string" && name.trim().length == 0) return false;
+    
      return true;
   };
   
@@ -75,7 +74,7 @@ const validateEnum = function validateEnum(value) {
       return false;
     } else return true;
   };
-  let isValidObjectId = function (ObjectId) {
+  let validateObjectId = function (ObjectId) {
     return mongoose.isValidObjectId(ObjectId)
 }
 const passwordLength = function (password) {
@@ -107,9 +106,9 @@ const passwordLength = function (password) {
     validatePassword,
     validateRequest,
     validateNumber,
-    isValidObjectId,
+    validateObjectId,
     passwordLength,
      
-    
+    validateEnum ,
     isValidISBN
   };

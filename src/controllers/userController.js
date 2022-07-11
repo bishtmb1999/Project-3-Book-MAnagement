@@ -9,7 +9,8 @@ const {
     validateRequest,
     validateNumber,
    isValidObjectId, 
-   passwordLength
+   passwordLength,
+   validateEnum
   } = require("../validator/validation");
 
 
@@ -34,12 +35,15 @@ const regexNumber = function(val){
 const createUser = async function (req, res) {
     try {
         let user = req.body;
-        if (!validateString(user.title)) {
-            return res.status(400).send({ status: false, message: "title must be required" })
-        }
+        
         if (!validateRequest(user)) {
         return res.status(400).send({ status: false, message: "details is required in body" })
     }
+    if (!validateString(user.title)) {
+        return res.status(400).send({ status: false, message: "title must be required" })
+    }
+    if(!validateEnum){return res.status(400).send({ status: false, message: "title must be 'Mr' /'Mrs' /'Miss'"})}
+
         if (!validateString(user.name))  {
             return res.status(400).send({ status: false, message: "name is required" })
         }
@@ -50,6 +54,7 @@ const createUser = async function (req, res) {
         if(!user.phone){
             return res.status(400).send({ status: false, message: "number must be required" })
         }
+        if(typeof user.phone !== "string"){return res.status(400).send({ status: false, message:"phone must be a string"})}
         if(!regexNumber(user.phone)){
             return res.status(400).send({ status: false, message: "please enter a valid number/number must be start with 9/8/7/6" })
         }
@@ -69,10 +74,6 @@ const createUser = async function (req, res) {
         }
         if(!passwordLength(user.password)){
             return res.status(400).send({ status: false, message: "password must be between 8 to 15" })   
-        }
-        
-        if((Object.keys(user.address).length==0)){
-            return res.status(400).send({ status: false, message: "address must be required" })
         }
         let userCreated = await userModel.create(user)
         res.status(201).send({
