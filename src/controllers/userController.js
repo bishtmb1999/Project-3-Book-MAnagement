@@ -26,6 +26,11 @@ const regexNumber = function(val){
     let regx = /^(?:(?:\+|0{0,2})91(\s*|[\-])?|[0]?)?([6789]\d{2}([ -]?)\d{3}([ -]?)\d{4})$/
     return regx.test(val)}
 
+
+
+//  <=================================>[CREATE USER API] <==============================>
+
+
 const createUser = async function (req, res) {
     try {
         let user = req.body;
@@ -80,6 +85,8 @@ const createUser = async function (req, res) {
 };
 
 
+//  <=================================>[USER LOGIN API] <==============================>
+
 let userLogin=async function(req,res){
     try{
     let email=req.body.email
@@ -116,5 +123,4 @@ if (!validateString(password))  {
 
 
 
-module.exports.userLogin=userLogin
-module.exports.createUser=createUser
+module.exports={createUser,userLogin}
