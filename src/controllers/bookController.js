@@ -136,9 +136,11 @@ const createBook = async function (req, res) {
     } else {
       book.reviews = reviews;
     }
+   let regx=/^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/;
+   
 
-    if (releasedAt) {
-      book.releasedAt = moment().toISOString();
+    if (regx.test(releasedAt)) {
+      book.releasedAt = releasedAt;
     } else {
       return res
         .status(400)
@@ -242,6 +244,7 @@ const getBookById = async function(req, res) {
           
         let find=await bookModel.findOne({_id:bookId},{ISBN:0,__v:0}).lean()
         find.reviewsData = reviewArray
+        
           return res.status(200).send({
               status: true,
               message: "Book List",
