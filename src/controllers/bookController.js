@@ -136,16 +136,8 @@ const createBook = async function (req, res) {
     } else {
       book.reviews = reviews;
     }
-   let regx=/^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/;
-   
-
-    if (regx.test(releasedAt)) {
-      book.releasedAt = releasedAt;
-    } else {
-      return res
-        .status(400)
-        .send({ status: false, message: "releasedAt is required" });
-    }
+  
+   book.releasedAt = moment(releasedAt).format("YYYY-MM-DD, h:mm:ss a")
 
     let createdBook = await bookModel.create(book);
     res.status(201).send({status:true,data:createdBook});
@@ -329,7 +321,7 @@ const getBookById = async function(req, res) {
       }
       let newData = await bookModel.findOneAndUpdate(
         { _id: bookId },
-        { $set: { isDeleted: true,deletedAt: moment().toISOString()
+        { $set: { isDeleted: true,deletedAt: moment(deletedAt).format("YYYY-MM-DD, h:mm:ss a")
          } },
         { new: true }
       );

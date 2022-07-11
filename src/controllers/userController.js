@@ -47,8 +47,11 @@ const createUser = async function (req, res) {
             return res.status(400).send({ status: false, message: "please provide a valid name" })
         }
 
-        if(!validateString(user.phone) || !regexNumber(user.phone)){
+        if(!user.phone){
             return res.status(400).send({ status: false, message: "number must be required" })
+        }
+        if(!regexNumber(user.phone)){
+            return res.status(400).send({ status: false, message: "please enter a valid number/number must be start with 9/8/7/6" })
         }
         const checkPhone = await userModel.findOne({ phone: user.phone })
         if (checkPhone) {
