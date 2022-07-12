@@ -199,7 +199,7 @@ const getBooks = async function (req, res) {
       data: find
     })
   } catch (error) {
-    res.status(500).send({
+   return res.status(500).send({
       status: false,
       message: error.message
     })
@@ -246,7 +246,7 @@ const getBookById = async function (req, res) {
 
 
   } catch (error) {
-    res.status(500).send({
+   return res.status(500).send({
       status: false,
       message: error.message
     })
@@ -303,7 +303,7 @@ const updateBook = async function (req, res) {
     });
     res.status(200).send({ status: true, message: " Data is Updated ", data: updateData });
   } catch (err) {
-    res.status(500).send({ status: false, error: err.message });
+   return res.status(500).send({ status: false, error: err.message });
   }
 };
 
@@ -333,7 +333,7 @@ const deleteBook = async function (req, res) {
     );
     res.status(200).send({ status: true, message: "Success" });
   } catch (err) {
-    res.status(500).send({ status: false, msg: "ERROR", error: err.message });
+   return res.status(500).send({ status: false, message: err.message });
   }
 };
 
