@@ -218,7 +218,7 @@ const getBookById = async function (req, res) {
         message: "Bookid invalid"
       })
     }
-    const data = await bookModel.find({ _id: bookId })
+    const data = await bookModel.find({ _id: bookId})
 
 
     if (!data) {
@@ -227,19 +227,15 @@ const getBookById = async function (req, res) {
         message: "Book does not exist"
       })
     }
-    if (data.isDeleted == true) {
-      return res.status.send({
-        status: false,
-        message: "Book already deleted"
-      })
-    }
+    
 
     const reviewArray = await reviewsModel.find({
       bookId: data._id,
       isDeleted: false
-    }).select({ _v: 0, isDeleted: 0 })
+    }).select({ _v: 0, isDeleted: 0 }).lean()
 
-    let find = await bookModel.findOne({ _id: bookId }, { ISBN: 0, __v: 0 }).lean()
+    let find = await bookModel.findOne({ _id: bookId, isDeleted:false }, { ISBN: 0, __v: 0 }).lean()
+    if(!find){return res.status(404).send({status:false,message:"data not found"})}
     find.reviewsData = reviewArray
 
     return res.status(200).send({
@@ -294,10 +290,12 @@ const updateBook = async function (req, res) {
     let duplicateISBN = await bookModel.find({ ISBN: data.ISBN })
     if (duplicateISBN.length != 0) { return res.status(400).send({ status: false, message: "This ISBN is already present" }) }
     else { book.ISBN = data.ISBN; }
-
+    
+    if(data.releasedAt){
     if (!validateString(data.releasedAt)) { return res.status(400).send({ status: false, message: "Provide a valid releasedAt" }) }
     if (!moment(data.releasedAt, 'YYYY-MM-DD', true).isValid()) { return res.status(400).send({ status: false, message: "Enter the date in 'YYYY-MM-DD' format" }) }
-    if (data.releasedAt) { book.releasedAt = data.releasedAt; }
+    }
+    else{ book.releasedAt = data.releasedAt; }
 
 
     let updateData = await bookModel.findOneAndUpdate({ _id: id }, { $set: book }, {
@@ -314,7 +312,7 @@ const updateBook = async function (req, res) {
 const deleteBook = async function (req, res) {
   try {
     let bookId = req.params.bookId;
-    if (bookId.length == 0) { return res.status(400).send({ status: false, msg: "Please include an bookId" }) };
+    
     if (!validateObjectId(bookId)) { return res.status(400).send({ status: false, msg: "Please enter a valid bookId" }) }
     let book = await bookModel.findById(bookId);
     if (!book)
