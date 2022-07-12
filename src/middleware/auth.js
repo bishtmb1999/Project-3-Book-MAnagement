@@ -1,10 +1,10 @@
 let jwt = require("jsonwebtoken");
 const userModel = require("../models/userModel");
-const bookModel=require("../models/bookModel")
+const bookModel = require("../models/bookModel")
 const {
-  
- validateObjectId
- 
+
+  validateObjectId
+
 } = require("../validator/validation");
 
 const authenticate = function (req, res, next) {
@@ -25,16 +25,16 @@ const authenticate = function (req, res, next) {
     // storing the decoded token
 
     // req.token = decodedToken;
-    
-    jwt.verify(token,"functionup-radon", (err, user) => {
+
+    jwt.verify(token, "functionup-radon", (err, user) => {
       if (err)
-     
-          return res.status(401).send({status:false,message: "invalid token"});
-          req.user=user
-          console.log(user)
+
+        return res.status(401).send({ status: false, message: "invalid token" });
+      req.user = user
+      console.log(user)
       next();
-  });
-   
+    });
+
   } catch (err) {
     res.status(500).send({
       status: false,
@@ -46,11 +46,11 @@ const authenticate = function (req, res, next) {
 const authorise = async function (req, res, next) {
   try {
     let { userId } = req.body;
-    if (!userId) {return res.status(400).send({status: false, message: "please provide userId"})}
-  
-    if(!validateObjectId(userId)){
-      return res.status(400).send({status: false, message: "Invalid userId"})
-      }
+    if (!userId) { return res.status(400).send({ status: false, message: "please provide userId" }) }
+
+    if (!validateObjectId(userId)) {
+      return res.status(400).send({ status: false, message: "Invalid userId" })
+    }
     let checkData = await userModel.findOne({ _id: userId });
     if (!checkData) {
       return res.status(404).send({ status: false, message: "Invalid userId" });
@@ -62,7 +62,7 @@ const authorise = async function (req, res, next) {
         .send({ status: false, message: "Authorization failed." });
     }
 
-    
+
     next();
   } catch (err) {
     return res
@@ -73,9 +73,9 @@ const authorise = async function (req, res, next) {
 const authorisePutAndDelete = async function (req, res, next) {
   try {
     let { bookId } = req.params;
-    if(!validateObjectId(bookId)){
-      return res.status(400).send({status: false, message: "Invalid bookId"})
-      }
+    if (!validateObjectId(bookId)) {
+      return res.status(400).send({ status: false, message: "Invalid bookId" })
+    }
     let checkData = await bookModel.findOne({ _id: bookId });
     if (!checkData) {
       return res.status(404).send({ status: false, message: "bookId doesnot exists" });
@@ -87,7 +87,7 @@ const authorisePutAndDelete = async function (req, res, next) {
         .send({ status: false, message: "Authorization failed." });
     }
 
-    
+
     next();
   } catch (err) {
     return res
@@ -96,4 +96,4 @@ const authorisePutAndDelete = async function (req, res, next) {
   }
 };
 
-module.exports = { authenticate, authorise,authorisePutAndDelete };
+module.exports = { authenticate, authorise, authorisePutAndDelete };

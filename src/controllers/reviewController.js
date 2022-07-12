@@ -2,7 +2,7 @@ const bookModel = require("../models/bookModel")
 let reviewModel = require("../models/reviewModel")
 
 
-const {  validateString, validateRequest, validateNumber, validateObjectId } = require("../validator/validation")
+const { validateString, validateRequest, validateNumber, validateObjectId } = require("../validator/validation")
 
 
 
@@ -89,6 +89,7 @@ const createReview = async function (req, res) {
             isDeleted: 0
 
         })
+        checkBook._doc["reviewsData"] = sendReview
         // if(reviewCreate){
         //     let reviewIncr = checkBook.reviews + 1
         //     checkBook.reviews = reviewIncr
@@ -97,7 +98,7 @@ const createReview = async function (req, res) {
         res.status(201).send({
             status: true,
             message: "Success",
-            data: sendReview
+            data: checkBook
         })
     } catch (error) {
         res.status(500).send({
@@ -160,7 +161,7 @@ const updateReview = async function (req, res) {
         }
 
 
-        let book = await bookModel.findOne({ _id: bookId, isDeleted: false });
+        let book = await bookModel.findOne({ _id: bookId, isDeleted: false }).select({ __v: 0, ISBN: 0 });
         if (!book) {
             return res
                 .status(404)

@@ -1,5 +1,5 @@
-let userModel=require("../models/userModel")
-let jwt=require("jsonwebtoken")
+let userModel = require("../models/userModel")
+let jwt = require("jsonwebtoken")
 const {
     validateString,
     convertToArray,
@@ -8,24 +8,25 @@ const {
     validatePassword,
     validateRequest,
     validateNumber,
-   isValidObjectId, 
-   passwordLength,
-   validateEnum
-  } = require("../validator/validation");
+    isValidObjectId,
+    passwordLength,
+    validateEnum
+} = require("../validator/validation");
 
 
-const validator  = require('validator')
+const validator = require('validator')
 
 
 
-const regxValidator = function(val){
+const regxValidator = function (val) {
     let regx = /^[a-zA-Z]+([\s][a-zA-Z]+)*$/;
     return regx.test(val);
 }
 
-const regexNumber = function(val){
+const regexNumber = function (val) {
     let regx = /^(?:(?:\+|0{0,2})91(\s*|[\-])?|[0]?)?([6789]\d{2}([ -]?)\d{3}([ -]?)\d{4})$/
-    return regx.test(val)}
+    return regx.test(val)
+}
 
 
 
@@ -35,27 +36,27 @@ const regexNumber = function(val){
 const createUser = async function (req, res) {
     try {
         let user = req.body;
-        
-        if (!validateRequest(user)) {
-        return res.status(400).send({ status: false, message: "details is required in body" })
-    }
-    if (!validateString(user.title)) {
-        return res.status(400).send({ status: false, message: "title must be required" })
-    }
-    if(!validateEnum){return res.status(400).send({ status: false, message: "title must be 'Mr' /'Mrs' /'Miss'"})}
 
-        if (!validateString(user.name))  {
+        if (!validateRequest(user)) {
+            return res.status(400).send({ status: false, message: "details is required in body" })
+        }
+        if (!validateString(user.title)) {
+            return res.status(400).send({ status: false, message: "title must be required" })
+        }
+        if (!validateEnum) { return res.status(400).send({ status: false, message: "title must be 'Mr' /'Mrs' /'Miss'" }) }
+
+        if (!validateString(user.name)) {
             return res.status(400).send({ status: false, message: "name is required" })
         }
-        if (!regxValidator(user.name))  {
+        if (!regxValidator(user.name)) {
             return res.status(400).send({ status: false, message: "please provide a valid name" })
         }
 
-        if(!user.phone){
+        if (!user.phone) {
             return res.status(400).send({ status: false, message: "number must be required" })
         }
-        if(typeof user.phone !== "string"){return res.status(400).send({ status: false, message:"phone must be a string"})}
-        if(!regexNumber(user.phone)){
+        if (typeof user.phone !== "string") { return res.status(400).send({ status: false, message: "phone must be a string" }) }
+        if (!regexNumber(user.phone)) {
             return res.status(400).send({ status: false, message: "please enter a valid number/number must be start with 9/8/7/6" })
         }
         const checkPhone = await userModel.findOne({ phone: user.phone })
@@ -72,17 +73,22 @@ const createUser = async function (req, res) {
         if (checkEmailId) {
             return res.status(400).send({ status: false, message: `email ${user.email} is already used` })
         }
-        if(!passwordLength(user.password)){
-            return res.status(400).send({ status: false, message: "password must be between 8 to 15" })   
+        if (!passwordLength(user.password)) {
+            return res.status(400).send({ status: false, message: "password must be between 8 to 15" })
         }
+        if (!validateString(user.address)) { return res.status(400).send({ status: false, message: "please provide address" }) }
+        if (!validateString(user.address.street)) { return res.status(400).send({ status: false, message: "please provide street" }) }
+        if (!validateString(user.address.city)) { return res.status(400).send({ status: false, message: "please provide city" }) }
+        if (!validateString(user.address.pincode)) { return res.status(400).send({ status: false, message: "please provide pincode" }) }
+
         let userCreated = await userModel.create(user)
         res.status(201).send({
             status: true,
-            message:"Success",
+            message: "Success",
             data: userCreated
         })
 
-    } catch (error) { 
+    } catch (error) {
         res.status(500).send({ message: error.message })
 
     }
@@ -91,35 +97,35 @@ const createUser = async function (req, res) {
 
 //  <=================================>[USER LOGIN API] <==============================>
 
-let userLogin=async function(req,res){
-    try{
-    let email=req.body.email
-    let password=req.body.password
-      if (!validateString(email))  {
-    return res.status(400).send({ status: false, message: "email is required" })
-}
-if (!validateString(password))  {
-    return res.status(400).send({ status: false, message: "password is required" })
-}
+let userLogin = async function (req, res) {
+    try {
+        let email = req.body.email
+        let password = req.body.password
+        if (!validateString(email)) {
+            return res.status(400).send({ status: false, message: "email is required" })
+        }
+        if (!validateString(password)) {
+            return res.status(400).send({ status: false, message: "password is required" })
+        }
 
-    let user = await userModel.findOne({ email:email, password:password});
-    if (!user)
-      return res.status(400).send({
-        status: false,
-        message: "email or the password is not corerct",
-      });
-      let token = jwt.sign(
-        {
-          userId: user._id.toString(),
-          iat: new Date().getTime(),
-        exp: new Date().setDate(new Date().getDate() + 1)
-        },
-        "functionup-radon"
-      );
-      
-      res.status(201).send({ status: true, message:"Success" ,data:token});
-      }
-      catch (err) {
+        let user = await userModel.findOne({ email: email, password: password });
+        if (!user)
+            return res.status(400).send({
+                status: false,
+                message: "email or the password is not corerct",
+            });
+        let token = jwt.sign(
+            {
+                userId: user._id.toString(),
+                iat: new Date().getTime(),
+                exp: new Date().setDate(new Date().getDate() + 1)
+            },
+            "functionup-radon"
+        );
+
+        res.status(201).send({ status: true, message: "Success", data: token });
+    }
+    catch (err) {
         console.log("This is the error :", err.message)
         res.status(500).send({ message: "Error", error: err.message })
     }
@@ -127,4 +133,4 @@ if (!validateString(password))  {
 
 
 
-module.exports={createUser,userLogin}
+module.exports = { createUser, userLogin }
