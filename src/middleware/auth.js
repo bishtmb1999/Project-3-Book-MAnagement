@@ -16,16 +16,7 @@ const authenticate = function (req, res, next) {
         .send({ status: false, message: "Please provide token in header" });
     }
 
-    // let decodedToken = jwt.verify(token, "functionup-radon");
-    // if (!decodedToken) {
-    //   return res
-    //     .status(400)
-    //     .send({ status: false, message: "Token is not correct" });
-    // }
-    // storing the decoded token
-
-    // req.token = decodedToken;
-
+    
     jwt.verify(token, "functionup-radon", (err, user) => {
       if (err)
 
@@ -58,7 +49,7 @@ const authorise = async function (req, res, next) {
 
     if (checkData._id != req.user.userId) {
       return res
-        .status(404)
+        .status(403)
         .send({ status: false, message: "Authorization failed." });
     }
 
@@ -83,7 +74,7 @@ const authorisePutAndDelete = async function (req, res, next) {
 
     if (checkData.userId != req.user.userId) {
       return res
-        .status(404)
+        .status(403)
         .send({ status: false, message: "Authorization failed." });
     }
 

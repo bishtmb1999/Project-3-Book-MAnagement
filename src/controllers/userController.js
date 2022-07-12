@@ -24,7 +24,7 @@ const regxValidator = function (val) {
 }
 
 const regexNumber = function (val) {
-    let regx = /^(?:(?:\+|0{0,2})91(\s*|[\-])?|[0]?)?([6789]\d{2}([ -]?)\d{3}([ -]?)\d{4})$/
+    let regx = /^([+]\d{2})?\d{10}$/
     return regx.test(val)
 }
 
@@ -112,7 +112,7 @@ let userLogin = async function (req, res) {
         if (!user)
             return res.status(400).send({
                 status: false,
-                message: "email or the password is not corerct",
+                message: "email or the password is not correct",
             });
         let token = jwt.sign(
             {
@@ -123,11 +123,11 @@ let userLogin = async function (req, res) {
             "functionup-radon"
         );
 
-        res.status(201).send({ status: true, message: "Success", data: token });
+        res.status(200).send({ status: true, message: "Success", data: token });
     }
     catch (err) {
-        console.log("This is the error :", err.message)
-        res.status(500).send({ message: "Error", error: err.message })
+        
+    res.status(500).send({ status:false, error: err.message })
     }
 }
 

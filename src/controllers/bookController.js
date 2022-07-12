@@ -138,15 +138,30 @@ const createBook = async function (req, res) {
 
 const getBooks = async function (req, res) {
   try {
+    
+
     const queryData = req.query
+    let { userId, category, subcategory } = queryData
+    
+    getFilter=Object.keys(queryData)
+    if(getFilter.length){
+      for(let value of getFilter){
+          if(['category', 'userId', 'subCategory'].indexOf(value)==-1)
+          return res.status(400).send({status: false, message: `You can't filter Using '${value}' `})
+       }
+      }
+
+
     let obj = {
       isDeleted: false
     }
 
     if (Object.keys(queryData).length !== 0) {
+      
 
-      let { userId, category, subcategory } = queryData
 
+     
+     
       if (userId) {
         if (!validateObjectId(userId)) {
           return res.status(400).send({ status: false, message: "Invalid userId" })
@@ -161,6 +176,8 @@ const getBooks = async function (req, res) {
       }
 
     }
+    
+
     let find = await bookModel.find(obj).select({
       ISBN: 0,
       subcategory: 0,
@@ -311,7 +328,7 @@ const deleteBook = async function (req, res) {
       { _id: bookId },
       {
         $set: {
-          isDeleted: true, deletedAt: moment(deletedAt).format("YYYY-MM-DD, h:mm:ss a")
+          isDeleted: true, deletedAt: moment().format("YYYY-MM-DD, h:mm:ss a")
         }
       },
       { new: true }
