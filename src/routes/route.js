@@ -10,7 +10,7 @@ router.post("/login", userLogin)
 router.post("/books", authenticate, authorise, createBook)
 router.get("/books", authenticate, getBooks)
 router.get("/books/:bookId", authenticate, getBookById)
-router.put("/books/:bookId", updateBook)
+router.put("/books/:bookId", authenticate, authorisePutAndDelete, updateBook)
 router.delete("/books/:bookId", authenticate, authorisePutAndDelete, deleteBook)
 
 router.post("/books/:bookId", createReview)

@@ -43,7 +43,7 @@ const createUser = async function (req, res) {
         if (!validateString(user.title)) {
             return res.status(400).send({ status: false, message: "title must be required" })
         }
-        if (!validateEnum) { return res.status(400).send({ status: false, message: "title must be 'Mr' /'Mrs' /'Miss'" }) }
+        if (!validateEnum(user.title)) { return res.status(400).send({ status: false, message: "title must be 'Mr' /'Mrs' /'Miss'" }) }
 
         if (!validateString(user.name)) {
             return res.status(400).send({ status: false, message: "name is required" })
