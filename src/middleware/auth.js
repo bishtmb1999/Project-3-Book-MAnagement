@@ -16,7 +16,7 @@ const authenticate = function (req, res, next) {
         .send({ status: false, message: "Please provide token in header" });
     }
 
-    
+
     jwt.verify(token, "functionup-radon", (err, user) => {
       if (err)
 

@@ -40,6 +40,8 @@ const createUser = async function (req, res) {
         if (!validateRequest(user)) {
             return res.status(400).send({ status: false, message: "details is required in body" })
         }
+
+
         if (!validateString(user.title)) {
             return res.status(400).send({ status: false, message: "title must be required" })
         }
@@ -52,10 +54,10 @@ const createUser = async function (req, res) {
             return res.status(400).send({ status: false, message: "please provide a valid name" })
         }
 
-        if (!user.phone) {
-            return res.status(400).send({ status: false, message: "number must be required" })
+
+        if (!validateString(user.phone)) {
+            return res.status(400).send({ status: false, message: "phone is required" })
         }
-        if (typeof user.phone !== "string") { return res.status(400).send({ status: false, message: "phone must be a string" }) }
         if (!regexNumber(user.phone)) {
             return res.status(400).send({ status: false, message: "please enter a valid number/number must be start with 9/8/7/6" })
         }
@@ -69,7 +71,7 @@ const createUser = async function (req, res) {
         if (!validator.isEmail(user.email)) {
             return res.status(400).send({ status: false, message: "email is not correct" })
         }
-        const checkEmailId = await userModel.findOne({ email: user.email })
+        const checkEmailId = await userModel.findOne({ email:user.email })
         if (checkEmailId) {
             return res.status(400).send({ status: false, message: `email ${user.email} is already used` })
         }
@@ -89,7 +91,7 @@ const createUser = async function (req, res) {
         })
 
     } catch (error) {
-      return  res.status(500).send({status:false, message: error.message })
+        return res.status(500).send({ status: false, message: error.message })
 
     }
 };
@@ -118,16 +120,16 @@ let userLogin = async function (req, res) {
             {
                 userId: user._id.toString(),
                 iat: new Date().getTime(),
-                exp: new Date().setDate(new Date().getDate() + 1)
+                exp: "1d"
             },
             "functionup-radon"
         );
 
-        res.status(200).send({ status: true, message: "Success", data: token });
+        res.status(200).send({ status: true, message: "Success", data:{token: token} });
     }
     catch (err) {
-        
-    return res.status(500).send({ status:false, message: err.message })
+
+        return res.status(500).send({ status: false, message: err.message })
     }
 }
 

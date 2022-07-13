@@ -17,7 +17,7 @@ const {
 
 const createBook = async function (req, res) {
   try {
-    let { title, excerpt, userId, ISBN, category, subcategory, reviews, releasedAt } = req.body;
+    let { title, excerpt, userId, ISBN, category, subcategory, releasedAt } = req.body;
     let book = {};
     if (!validateRequest(req.body)) {
       return res
@@ -117,13 +117,7 @@ const createBook = async function (req, res) {
         .send({ status: false, message: "Subcategory is required" });
     }
 
-    if (!validateNumber(reviews)) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Enter a valid review" });
-    } else {
-      book.reviews = reviews;
-    }
+
 
     book.releasedAt = moment(releasedAt).format("YYYY-MM-DD, h:mm:ss a")
 
@@ -138,18 +132,18 @@ const createBook = async function (req, res) {
 
 const getBooks = async function (req, res) {
   try {
-    
+
 
     const queryData = req.query
     let { userId, category, subcategory } = queryData
-    
-    getFilter=Object.keys(queryData)
-    if(getFilter.length){
-      for(let value of getFilter){
-          if(['category', 'userId', 'subcategory'].indexOf(value)==-1)
-          return res.status(400).send({status: false, message: `You can't filter Using '${value}' `})
-       }
+
+    getFilter = Object.keys(queryData)
+    if (getFilter.length) {
+      for (let value of getFilter) {
+        if (['category', 'userId', 'subcategory'].indexOf(value) == -1)
+          return res.status(400).send({ status: false, message: `You can't filter Using '${value}' ` })
       }
+    }
 
 
     let obj = {
@@ -157,11 +151,11 @@ const getBooks = async function (req, res) {
     }
 
     if (Object.keys(queryData).length !== 0) {
-      
 
 
-     
-     
+
+
+
       if (userId) {
         if (!validateObjectId(userId)) {
           return res.status(400).send({ status: false, message: "Invalid userId" })
@@ -176,7 +170,7 @@ const getBooks = async function (req, res) {
       }
 
     }
-    
+
 
     let find = await bookModel.find(obj).select({
       ISBN: 0,
@@ -199,7 +193,7 @@ const getBooks = async function (req, res) {
       data: find
     })
   } catch (error) {
-   return res.status(500).send({
+    return res.status(500).send({
       status: false,
       message: error.message
     })
@@ -218,7 +212,7 @@ const getBookById = async function (req, res) {
         message: "Bookid invalid"
       })
     }
-    const data = await bookModel.find({ _id: bookId})
+    const data = await bookModel.find({ _id: bookId })
 
 
     if (!data) {
@@ -227,15 +221,15 @@ const getBookById = async function (req, res) {
         message: "Book does not exist"
       })
     }
-    
+
 
     const reviewArray = await reviewsModel.find({
       bookId: data._id,
       isDeleted: false
     }).select({ _v: 0, isDeleted: 0 }).lean()
 
-    let find = await bookModel.findOne({ _id: bookId, isDeleted:false }, { ISBN: 0, __v: 0 }).lean()
-    if(!find){return res.status(404).send({status:false,message:"data not found"})}
+    let find = await bookModel.findOne({ _id: bookId, isDeleted: false }, { ISBN: 0, __v: 0 }).lean()
+    if (!find) { return res.status(404).send({ status: false, message: "data not found" }) }
     find.reviewsData = reviewArray
 
     return res.status(200).send({
@@ -246,7 +240,7 @@ const getBookById = async function (req, res) {
 
 
   } catch (error) {
-   return res.status(500).send({
+    return res.status(500).send({
       status: false,
       message: error.message
     })
@@ -290,12 +284,12 @@ const updateBook = async function (req, res) {
     let duplicateISBN = await bookModel.find({ ISBN: data.ISBN })
     if (duplicateISBN.length != 0) { return res.status(400).send({ status: false, message: "This ISBN is already present" }) }
     else { book.ISBN = data.ISBN; }
-    
-    if(data.releasedAt){
-    if (!validateString(data.releasedAt)) { return res.status(400).send({ status: false, message: "Provide a valid releasedAt" }) }
-    if (!moment(data.releasedAt, 'YYYY-MM-DD', true).isValid()) { return res.status(400).send({ status: false, message: "Enter the date in 'YYYY-MM-DD' format" }) }
+
+    if (data.releasedAt) {
+      if (!validateString(data.releasedAt)) { return res.status(400).send({ status: false, message: "Provide a valid releasedAt" }) }
+      if (!moment(data.releasedAt, 'YYYY-MM-DD', true).isValid()) { return res.status(400).send({ status: false, message: "Enter the date in 'YYYY-MM-DD' format" }) }
     }
-    else{ book.releasedAt = data.releasedAt; }
+    else { book.releasedAt = data.releasedAt; }
 
 
     let updateData = await bookModel.findOneAndUpdate({ _id: id }, { $set: book }, {
@@ -303,7 +297,7 @@ const updateBook = async function (req, res) {
     });
     res.status(200).send({ status: true, message: " Data is Updated ", data: updateData });
   } catch (err) {
-   return res.status(500).send({ status: false, error: err.message });
+    return res.status(500).send({ status: false, error: err.message });
   }
 };
 
@@ -312,28 +306,28 @@ const updateBook = async function (req, res) {
 const deleteBook = async function (req, res) {
   try {
     let bookId = req.params.bookId;
-    
+
     if (!validateObjectId(bookId)) { return res.status(400).send({ status: false, msg: "Please enter a valid bookId" }) }
     let book = await bookModel.findById(bookId);
     if (!book)
       return res.status(404).send({ status: false, msg: "BOOK NOT FOUND" });
     if (book.isDeleted == true) {
       return res
-        .status(400)
+        .status(404)
         .send({ status: false, msg: "This bookdata is already deleted" });
     }
     let newData = await bookModel.findOneAndUpdate(
       { _id: bookId },
       {
         $set: {
-          isDeleted: true, deletedAt: moment().format("YYYY-MM-DD, h:mm:ss a")
+          isDeleted: true, deletedAt:new Date
         }
       },
       { new: true }
     );
     res.status(200).send({ status: true, message: "Success" });
   } catch (err) {
-   return res.status(500).send({ status: false, message: err.message });
+    return res.status(500).send({ status: false, message: err.message });
   }
 };
 

@@ -82,20 +82,13 @@ const passwordLength = function (password) {
     return true;
   } else return false;
 };
-// const isbnLength = function (value) {
-//   if (value.length == 10 || value.length == 13 || value.length==17) {
-//     return true;
-//   } 
-//   if (( /^[0-9]*$/).test()){return true}
-//   else return false;
-// };
+
 
 const isValidISBN = function (ISBN) {
 
   if (/^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/.test(ISBN) || /^(?=(?:\D*\d){13}(?:(?:\D*\d){3})?$)[\d-]+$/.test(ISBN) || /^(?=(?:\D*\d){17}(?:(?:\D*\d){3})?$)[\d-]+$/.test(ISBN)) {
     return true
   }
-
   else { return false }
 }
 module.exports = {

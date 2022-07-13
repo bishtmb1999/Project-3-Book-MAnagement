@@ -50,6 +50,7 @@ const createReview = async function (req, res) {
             })
         }
         if (Object.keys(reviewData).indexOf("review") !== -1) {
+
             if (!validateString(review)) {
                 return res.status(400).send({
                     status: false,
@@ -57,19 +58,14 @@ const createReview = async function (req, res) {
                 })
             }
         }
-        const checkBook = await bookModel.findById(bookId)
+        const checkBook = await bookModel.findOne({_id:bookId,isDeleted:false})
         if (!checkBook) {
             return res.status(404).send({
                 status: false,
                 message: "Book not found"
             })
         }
-        if (checkBook.isDeleted == true) {
-            return res.status(404).send({
-                status: false,
-                message: "Book already deleted, You can't add review"
-            })
-        }
+        
         let obj = {
             reviewedBy,
             rating,
@@ -189,7 +185,7 @@ const updateReview = async function (req, res) {
             .status(200)
             .send({ status: true, message: "Books list", data: book });
     } catch (err) {
-       return res.status(500).send({ status: false, message: err.message });
+        return res.status(500).send({ status: false, message: err.message });
     }
 };
 
@@ -200,6 +196,11 @@ let deleteReview = async function (req, res) {
     try {
         let bookId = req.params.bookId
         let reviewId = req.params.reviewId
+        if (!validateObjectId(bookId) || !validateObjectId(reviewId)) {
+            return res
+                .status(400)
+                .send({ status: false, message: "Enter valid bookId or reviewId" });
+        }
         let book = await bookModel.find({ _id: bookId })
         if (book.length == 0) { return res.status(404).send({ status: false, message: "book doesnot exists" }) }
 
@@ -218,7 +219,7 @@ let deleteReview = async function (req, res) {
 
     }
     catch (err) {
-       return res.status(500).send({ status: false, message: err.message })
+        return res.status(500).send({ status: false, message: err.message })
     }
 }
 module.exports = { createReview, updateReview, deleteReview }
