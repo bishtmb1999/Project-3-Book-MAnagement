@@ -89,7 +89,8 @@ const createReview = async function (req, res) {
             isDeleted: 0
 
         })
-        checkBook._doc["reviewsData"] = sendReview
+        let calculatedReview = await bookModel.findById(bookId)
+        calculatedReview._doc["reviewsData"] = sendReview
         // if(reviewCreate){
         //     let reviewIncr = checkBook.reviews + 1
         //     checkBook.reviews = reviewIncr
@@ -98,7 +99,7 @@ const createReview = async function (req, res) {
         res.status(201).send({
             status: true,
             message: "Success",
-            data: checkBook
+            data: calculatedReview
         })
     } catch (error) {
         return res.status(500).send({

@@ -146,7 +146,7 @@ const getBooks = async function (req, res) {
     getFilter=Object.keys(queryData)
     if(getFilter.length){
       for(let value of getFilter){
-          if(['category', 'userId', 'subCategory'].indexOf(value)==-1)
+          if(['category', 'userId', 'subcategory'].indexOf(value)==-1)
           return res.status(400).send({status: false, message: `You can't filter Using '${value}' `})
        }
       }
