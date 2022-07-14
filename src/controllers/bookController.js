@@ -13,6 +13,19 @@ const {
   isValidISBN
 } = require("../validator/validation");
 
+//=============================BOOK COVER======================
+
+const bookCoverUrl = async function (req,res){
+ 
+  let bookCover = req.files;
+  if (bookCover && bookCover.length > 0) {
+    let uploadedFileURL = await uploadFile(bookCover[0]);
+    res.status(201).send({status:true, data:uploadedFileURL})
+  } else {
+   return  res.status(400).send({status:false, message: "No file found" });
+  }
+}
+
 // =========================POST BOOK =========================
 
 const createBook = async function (req, res) {
@@ -275,8 +288,6 @@ const updateBook = async function (req, res) {
     else { book.title = data.title; }
 
     if (!validateString(data.excerpt)) { return res.status(400).send({ status: false, message: "please provide valid excerpt" }) }
-    let duplicateExcerpt = await bookModel.find({ excerpt: data.excerpt })
-    if (duplicateExcerpt.length != 0) { return res.status(400).send({ status: false, message: "This excerpt is already present" }) }
     else { book.excerpt = data.excerpt; }
 
     if (!validateString(data.ISBN)) { return res.status(400).send({ status: false, message: "Please provide ISBN" }) }
@@ -331,4 +342,4 @@ const deleteBook = async function (req, res) {
   }
 };
 
-module.exports = { createBook, getBooks, updateBook, deleteBook, getBookById }
+module.exports = { createBook, getBooks, updateBook, deleteBook, getBookById,bookCoverUrl }

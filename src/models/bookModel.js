@@ -1,6 +1,7 @@
 let mongoose = require("mongoose")
 let objectId = mongoose.Schema.Types.ObjectId
 let bookSchema = new mongoose.Schema({
+    bookCover:String,
     title: { type: String, required: true, unique: true },
     excerpt: { type: String, required: true },
     userId: { type: objectId, required: true, ref: "User" },
