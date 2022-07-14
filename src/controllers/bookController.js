@@ -1,6 +1,7 @@
 const bookModel = require("../models/bookModel.js");
 const userModel = require("../models/userModel.js");
 const reviewsModel = require("../models/reviewModel")
+const {uploadFile}=require("./awsController")
 const mongoose = require("mongoose");
 const moment = require("moment")
 const {
@@ -18,8 +19,10 @@ const {
 const bookCoverUrl = async function (req,res){
  
   let bookCover = req.files;
+  
   if (bookCover && bookCover.length > 0) {
     let uploadedFileURL = await uploadFile(bookCover[0]);
+    
     res.status(201).send({status:true, data:uploadedFileURL})
   } else {
    return  res.status(400).send({status:false, message: "No file found" });
@@ -30,7 +33,7 @@ const bookCoverUrl = async function (req,res){
 
 const createBook = async function (req, res) {
   try {
-    let { title, excerpt, userId, ISBN, category, subcategory, releasedAt } = req.body;
+    let { title, excerpt, userId, ISBN, category, subcategory, releasedAt,bookCover } = req.body;
     let book = {};
     if (!validateRequest(req.body)) {
       return res
@@ -133,6 +136,7 @@ const createBook = async function (req, res) {
 
 
     book.releasedAt = moment(releasedAt).format("YYYY-MM-DD, h:mm:ss a")
+    book.bookCover=bookCover
 
     let createdBook = await bookModel.create(book);
     res.status(201).send({ status: true, data: createdBook });
@@ -275,7 +279,7 @@ const updateBook = async function (req, res) {
     if (!validateRequest(data)) { return res.status(400).send({ status: false, message: "please provide body data" }) }
     let book = await bookModel.findOne({ _id: id, isDeleted: false })
 
-    if (book == null) {
+    if (!book) {
       return res.status(404).send({ status: true, message: 'No such book found' });
     }
     ;

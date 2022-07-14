@@ -120,7 +120,7 @@ let userLogin = async function (req, res) {
             {
                 userId: user._id.toString(),
                 iat: new Date().getTime(),
-                exp: "1d"
+                exp: new Date().setDate(new Date().getDate() + 1)
             },
             "functionup-radon"
         );

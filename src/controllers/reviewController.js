@@ -166,7 +166,7 @@ const updateReview = async function (req, res) {
         }
 
         const bookReview = await reviewModel.findOneAndUpdate(
-            { _id: reviewId, bookId: bookId },
+            { _id: reviewId, bookId: bookId,isDeleted:false },
             { $set: { review: review, rating: rating, reviewedBy: reviewedBy } },
             { new: true }
         );

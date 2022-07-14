@@ -22,7 +22,7 @@ const authenticate = function (req, res, next) {
 
         return res.status(401).send({ status: false, message: "invalid token" });
       req.user = user
-      console.log(user)
+      
       next();
     });
 
