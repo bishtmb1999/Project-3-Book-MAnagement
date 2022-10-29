@@ -33,8 +33,10 @@ const bookCoverUrl = async function (req,res){
 
 const createBook = async function (req, res) {
   try {
+    let Files= req.Files
     let { title, excerpt, userId, ISBN, category, subcategory, releasedAt,bookCover } = req.body;
     let book = {};
+     
     if (!validateRequest(req.body)) {
       return res
         .status(400)
@@ -144,6 +146,7 @@ const createBook = async function (req, res) {
     return res.status(500).send({ status: false, message: err.message });
   }
 };
+
 
 // =========================GET BOOK QUERY PARAM =========================
 
@@ -345,5 +348,6 @@ const deleteBook = async function (req, res) {
     return res.status(500).send({ status: false, message: err.message });
   }
 };
+
 
 module.exports = { createBook, getBooks, updateBook, deleteBook, getBookById,bookCoverUrl }

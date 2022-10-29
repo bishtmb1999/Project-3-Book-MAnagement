@@ -1,4 +1,4 @@
-const express = require("express");
+
 const aws = require("aws-sdk");
 
 aws.config.update({
@@ -30,4 +30,4 @@ let uploadFile = async (file) => {
 };
 
 
-module.exports = {uploadFile}
+module.exports.uploadFile = uploadFile
